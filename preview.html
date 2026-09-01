@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SONAR — deep source mineral water (standalone preview)</title>
+<meta name="description" content="SONAR. Deep source mineral water with four botanicals. Sound finds what light cannot reach.">
+<meta name="theme-color" content="#04070a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://d8j0ntlcm91z4.cloudfront.net" crossorigin>
+<link rel="preconnect" href="https://d2ol7oe51mr4n9.cloudfront.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SONAR — Cinematic Dark, with one Apple-Minimal chapter (#product).
+   Every animated property is transform or opacity. Nothing else moves.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Palette sampled from the generated assets, then constrained.
+     Measured mean RGB across the accepted set ran 9-35 R / 36-85 G / 44-99 B,
+     so the base is a blue-black and the accent is the bioluminescent cyan. */
+  --abyss:      #04070a;
+  --deep:       #071118;
+  --deep-2:     #0b1a22;
+  --ink:        #e8f2f2;
+  --ink-dim:    #8aa3a8;
+  --ink-faint:  #4d6068;
+  --accent:     #4fe0d2;
+  --accent-dim: #2a7d78;
+  --warm:       #f2a65a;   /* used exactly once, in #surface */
+  --rule:       rgba(232, 242, 242, 0.12);
+
+  /* Type */
+  --display: "Oswald", "Haettenschweiler", "Arial Narrow", sans-serif;
+  --text:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+
+  --fs-eyebrow: 0.6875rem;
+  --fs-body:    clamp(0.95rem, 0.9rem + 0.25vw, 1.0625rem);
+  --fs-lead:    clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem);
+  --fs-h2:      clamp(1.9rem, 1.2rem + 3vw, 3.75rem);
+  --fs-hero:    clamp(4rem, 1rem + 18vw, 16rem);
+
+  /* Spacing — 8px base */
+  --s1: 0.5rem; --s2: 1rem; --s3: 1.5rem; --s4: 2rem;
+  --s5: 3rem;   --s6: 4rem; --s7: 6rem;   --s8: 9rem;
+
+  /* Motion constants. Water has drag: every ease is an ease-out.
+     Nothing on this site bounces, overshoots, or uses back/elastic. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur:      0.8s;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+/* No scroll-behavior: smooth — Lenis owns smoothing, two would fight. */
+
+body {
+  margin: 0;
+  background: var(--abyss);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, video { display: block; max-width: 100%; }
+/* An author-level display on img/video outranks the UA's [hidden] rule, so the
+   hidden attribute silently stops working on exactly the elements that use it
+   here (the video fallback, and the reduced-motion stills). Restore it. */
+[hidden] { display: none !important; }
+h1, h2, p, dl, dd, ol, ul { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--accent); color: var(--abyss);
+  padding: var(--s2) var(--s3); font: 500 0.875rem var(--text);
+}
+.skip:focus { left: var(--s2); top: var(--s2); }
+
+/* ── Shared type ─────────────────────────────────────────────────────── */
+
+.eyebrow {
+  font: 500 var(--fs-eyebrow)/1 var(--mono);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--s3);
+}
+.eyebrow--accent { color: var(--accent-dim); }
+.eyebrow--warm   { color: var(--warm); opacity: 0.75; }
+
+.h2 {
+  font: 300 var(--fs-h2)/1.05 var(--display);
+  letter-spacing: -0.015em;
+  max-width: 18ch;
+}
+
+/* Word-level reveal. The wrapper clips; the word rises into it. */
+.word {
+  display: inline-block; overflow: hidden; vertical-align: bottom;
+  /* The mask is the line box, which cuts descenders off. Grow it downward and
+     pull the extra back so the metrics are unchanged. */
+  padding-bottom: 0.14em; margin-bottom: -0.14em;
+}
+.word > span { display: inline-block; will-change: transform; }
+
+/* ── Fixed chrome: wordmark + depth instrument ───────────────────────── */
+
+.chrome {
+  position: fixed; inset: 0 0 auto 0; z-index: 50;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s3) clamp(var(--s3), 4vw, var(--s5));
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+.chrome__mark {
+  font: 600 0.875rem var(--display);
+  letter-spacing: 0.42em;
+}
+/* On a narrow viewport the fixed wordmark lands on top of the running headings.
+   The hero already says SONAR in 16vw type; the depth readout is the part that
+   earns its place up there. */
+@media (max-width: 700px) { .chrome__mark { display: none; } }
+
+.chrome__depth {
+  font: 400 0.8125rem var(--mono);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+/* Reserved width: the digit count changes from 1 to 3 as you descend, and a
+   flex sibling that resizes drags the whole row with it — a real layout shift. */
+.chrome__depth-val { display: inline-block; min-width: 4ch; text-align: right; }
+.chrome__depth-val::before { content: "−"; opacity: 0.5; }
+.chrome__depth-unit { opacity: 0.5; margin-left: 0.15em; }
+
+/* ── Chapter 0 — the descent ─────────────────────────────────────────── */
+
+.hero { position: relative; height: 100svh; overflow: hidden; }
+.hero__media { position: absolute; inset: 0; }
+.hero__video {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 45%;
+}
+.hero__scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(4,7,10,0.55) 0%, rgba(4,7,10,0) 35%),
+    linear-gradient(to top,    rgba(4,7,10,0.85) 0%, rgba(4,7,10,0) 45%);
+}
+
+.hero__copy {
+  position: absolute; z-index: 2;
+  left: clamp(var(--s3), 4vw, var(--s5));
+  right: clamp(var(--s3), 4vw, var(--s5));
+  bottom: clamp(var(--s6), 12vh, var(--s8));
+  will-change: transform, opacity;
+}
+.hero__title {
+  font: 300 var(--fs-hero)/0.82 var(--display);
+  letter-spacing: 0.02em;
+  margin: 0 0 var(--s2);
+}
+.hero__tagline {
+  font-size: var(--fs-lead);
+  color: var(--ink-dim);
+  max-width: 26ch;
+}
+.hero__hint {
+  position: absolute; z-index: 2;
+  right: clamp(var(--s3), 4vw, var(--s5));
+  bottom: clamp(var(--s6), 12vh, var(--s8));
+  display: flex; align-items: center; gap: var(--s2);
+  font: 400 var(--fs-eyebrow)/1 var(--mono);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero__hint-rule {
+  display: block; width: 64px; height: 1px;
+  background: linear-gradient(to right, var(--ink-faint), transparent);
+  transform-origin: left center;
+}
+
+/* ── Chapter 1 — the ping ────────────────────────────────────────────── */
+
+.ping { position: relative; height: 100svh; overflow: hidden; }
+.ping__media { position: absolute; inset: 0; }
+.ping__still {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.85;
+}
+.ping__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.ping__copy {
+  position: absolute; z-index: 2;
+  left: clamp(var(--s3), 6vw, var(--s7));
+  top: 50%; transform: translateY(-50%);
+  max-width: min(46ch, 80vw);
+}
+.ping__line {
+  font: 300 var(--fs-h2)/1.08 var(--display);
+  letter-spacing: -0.015em;
+  margin-bottom: var(--s3);
+}
+.ping__body { color: var(--ink-dim); max-width: 34ch; }
+/* Words start hidden; the expanding wavefront switches them on as it passes. */
+.ping__line .w, .ping__body .w { display: inline-block; will-change: opacity, transform; }
+
+/* ── Chapter 2 — the source ──────────────────────────────────────────── */
+
+.source {
+  display: grid; gap: var(--s5);
+  grid-template-columns: 1fr;
+  padding: var(--s8) clamp(var(--s3), 4vw, var(--s5));
+  background: linear-gradient(to bottom, var(--abyss), var(--deep) 40%, var(--abyss));
+}
+.source__media { position: relative; }
+.source__img {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  will-change: transform;
+}
+.steps { margin-top: var(--s5); display: grid; gap: var(--s4); }
+.step { border-top: 1px solid var(--rule); padding-top: var(--s2); max-width: 46ch; }
+.step__n {
+  display: block; margin-bottom: var(--s1);
+  font: 500 var(--fs-eyebrow)/1 var(--mono);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent-dim);
+}
+.step p { color: var(--ink-dim); }
+
+@media (min-width: 900px) {
+  .source { grid-template-columns: 1.1fr 1fr; gap: var(--s7); align-items: center; }
+  .source__media { position: sticky; top: 12vh; }
+}
+
+/* ── Chapter 3 — the botanicals ──────────────────────────────────────── */
+
+.bot {
+  display: grid; gap: var(--s5); grid-template-columns: 1fr;
+  padding: var(--s8) clamp(var(--s3), 4vw, var(--s5));
+  background: var(--abyss);
+}
+.bot__media { position: relative; }
+.bot__video, .bot__still {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+}
+.bot__list { margin-top: var(--s5); }
+.bot__list li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3);
+  border-top: 1px solid var(--rule);
+  padding: var(--s2) 0;
+}
+.bot__list span { font: 300 clamp(1.25rem, 1rem + 1vw, 1.75rem) var(--display); letter-spacing: 0.01em; }
+.bot__list em { font-style: normal; color: var(--ink-faint); font-size: 0.875rem; text-align: right; }
+
+@media (min-width: 900px) {
+  .bot { grid-template-columns: 1fr 1fr; gap: var(--s7); align-items: center; }
+}
+
+/* ── Chapter 4 — the can. The calm chapter: no effects, only whitespace. ─ */
+
+.product {
+  padding: var(--s8) clamp(var(--s3), 4vw, var(--s5));
+  background: var(--abyss);
+  border-top: 1px solid var(--rule);
+}
+.product__grid {
+  display: grid; gap: var(--s6);
+  grid-template-columns: 1fr;
+  max-width: 1400px; margin: 0 auto;
+}
+.product__can { position: relative; margin: 0; }
+.product__can img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+/* The can in the photograph is deliberately blank. The wordmark is real text. */
+.product__wordmark {
+  position: absolute; left: 50%; top: 58%;
+  transform: translate(-50%, -50%);
+  font: 600 clamp(0.75rem, 0.5rem + 1vw, 1.125rem) var(--display);
+  letter-spacing: 0.5em; text-indent: 0.5em;
+  color: rgba(240, 248, 248, 0.96);
+  text-shadow: 0 1px 12px rgba(4, 7, 10, 0.75);
+}
+.spec { margin: var(--s5) 0; }
+.spec > div {
+  display: flex; justify-content: space-between; gap: var(--s3);
+  border-top: 1px solid var(--rule); padding: var(--s2) 0;
+  font: 400 0.875rem var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.spec dt { color: var(--ink-faint); letter-spacing: 0.04em; }
+.spec dd { margin: 0; }
+.variants { display: grid; gap: var(--s2); }
+.variants li {
+  display: flex; align-items: baseline; gap: var(--s3);
+  border-left: 1px solid var(--accent-dim); padding-left: var(--s2);
+}
+.variants__depth {
+  font: 400 0.75rem var(--mono); color: var(--accent-dim);
+  letter-spacing: 0.08em; min-width: 5ch;
+}
+.variants__name { font: 300 1.25rem var(--display); letter-spacing: 0.02em; }
+
+.product__pour { margin: 0; }
+.product__pour-video, .product__pour-still {
+  /* 9:16, not 3:4 — Kling 3.0 only emits 16:9, 9:16 and 1:1, so the keyframes
+     were regenerated to match the clip rather than cropping the clip to match
+     an arbitrary box. */
+  width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
+}
+.product__pour figcaption {
+  margin-top: var(--s2); color: var(--ink-faint);
+  font-size: 0.8125rem; max-width: 32ch;
+}
+
+@media (min-width: 1000px) {
+  .product__grid { grid-template-columns: 1fr 1.2fr 0.85fr; align-items: start; gap: var(--s7); }
+}
+
+/* ── Chapter 5 — the ascent. The only warm frame on the site. ─────────── */
+
+.surface { position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; }
+.surface__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+.surface::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(4,7,10,0.2), rgba(4,7,10,0.9) 70%);
+}
+.surface__copy {
+  position: relative; z-index: 2; text-align: center;
+  padding: var(--s5) clamp(var(--s3), 4vw, var(--s5));
+  max-width: 44ch;
+}
+.surface__title {
+  font: 300 var(--fs-h2)/1.05 var(--display);
+  letter-spacing: -0.015em; margin-bottom: var(--s3);
+}
+.surface__body { color: var(--ink-dim); margin-bottom: var(--s5); }
+.cta {
+  display: inline-block; text-decoration: none;
+  font: 500 0.8125rem var(--mono);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--warm);
+  border: 1px solid rgba(242, 166, 90, 0.4);
+  padding: var(--s2) var(--s4);
+  transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+}
+.cta:hover { transform: translateY(-2px); border-color: var(--warm); }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+
+.foot {
+  padding: var(--s6) clamp(var(--s3), 4vw, var(--s5));
+  border-top: 1px solid var(--rule);
+  display: grid; gap: var(--s3);
+}
+.foot__mark { font: 600 0.875rem var(--display); letter-spacing: 0.42em; }
+.foot__note { color: var(--ink-faint); font-size: 0.8125rem; max-width: 60ch; }
+
+/* ═══ Reduced motion: a complete branch, not a toned-down one ═══════════
+   Pinning, scrubbing and the wavefront reveal are all disabled in JS.
+   Here we make sure nothing is left invisible or mid-transform.        */
+@media (prefers-reduced-motion: reduce) {
+  .hero { height: auto; min-height: 70svh; }
+  .ping { height: auto; min-height: 70svh; padding: var(--s7) 0; }
+  .ping__copy { position: relative; top: auto; transform: none; padding: var(--s7) 0; }
+  .ping__still { position: absolute; inset: 0; }
+  .word > span, .ping__line .w, .ping__body .w { transform: none !important; opacity: 1 !important; }
+  .cta { transition: none; }
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
+
+</style>
+</head>
+<body>
+
+<a class="skip" href="#source">Skip to content</a>
+
+<header class="chrome">
+  <span class="chrome__mark">SONAR</span>
+  <span class="chrome__depth" aria-live="off">
+    <span class="chrome__depth-val" id="depthVal">0</span><span class="chrome__depth-unit">m</span>
+  </span>
+</header>
+
+<!-- ══ Chapter 0 — the descent ═══════════════════════════════════════════ -->
+<section id="hero" class="hero" data-depth-from="0" data-depth-to="80">
+  <div class="hero__media">
+    <video id="descent" class="hero__video" muted playsinline preload="auto" aria-hidden="true"></video>
+    <img id="descentFallback" class="hero__video hero__video--fallback" alt="" aria-hidden="true" hidden>
+    <div class="hero__scrim"></div>
+  </div>
+
+  <div class="hero__copy">
+    <p class="eyebrow">Deep source mineral water</p>
+    <h1 class="hero__title">SONAR</h1>
+    <p class="hero__tagline" data-reveal>Taste the depth.</p>
+  </div>
+
+  <div class="hero__hint" aria-hidden="true">
+    <span>Scroll to descend</span>
+    <span class="hero__hint-rule"></span>
+  </div>
+</section>
+
+<!-- ══ Chapter 1 — the ping ══════════════════════════════════════════════ -->
+<section id="ping" class="ping" data-depth-from="80" data-depth-to="140">
+  <div class="ping__media">
+    <img class="ping__still" id="pingStill" alt="" aria-hidden="true">
+    <canvas class="ping__canvas" id="pingCanvas" aria-hidden="true"></canvas>
+  </div>
+  <div class="ping__copy">
+    <p class="eyebrow eyebrow--accent">The principle</p>
+    <h2 class="ping__line" id="pingLine">Sound finds what light cannot reach.</h2>
+    <p class="ping__body" id="pingBody">Every source we bottle was mapped by sonar long before it was ever tasted.</p>
+  </div>
+</section>
+
+<!-- ══ Chapter 2 — the source ════════════════════════════════════════════ -->
+<section id="source" class="source" data-depth-from="140" data-depth-to="200">
+  <div class="source__media">
+    <img class="source__img" id="sourceImg" alt="A mineral spring flowing from a crevice in underwater basalt rock.">
+  </div>
+  <div class="source__steps">
+    <p class="eyebrow">01 — The source</p>
+    <h2 class="h2" data-reveal>Filtered through nine hundred metres of basalt.</h2>
+    <ol class="steps">
+      <li class="step" data-reveal>
+        <span class="step__n">Pressure</span>
+        <p>At 940 metres the water sits under ninety-four atmospheres. Nothing dissolved in it comes out again.</p>
+      </li>
+      <li class="step" data-reveal>
+        <span class="step__n">Time</span>
+        <p>It entered the rock as rain eleven thousand years ago and has been moving downward ever since.</p>
+      </li>
+      <li class="step" data-reveal>
+        <span class="step__n">Mineral</span>
+        <p>Basalt gives up silica, magnesium and a trace of lithium. We add nothing and remove nothing.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ Chapter 3 — the botanicals ════════════════════════════════════════ -->
+<section id="botanicals" class="bot" data-depth-from="200" data-depth-to="240">
+  <div class="bot__media">
+    <video class="bot__video" id="botVideo" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <img class="bot__still" id="botStill" alt="Juniper, kelp, bergamot peel and coriander seed suspended in dark water." hidden>
+  </div>
+  <div class="bot__copy">
+    <p class="eyebrow">02 — The botanicals</p>
+    <h2 class="h2" data-reveal>Four botanicals. Nothing else.</h2>
+    <ul class="bot__list">
+      <li data-reveal><span>Juniper</span><em>resin, pine, a dry finish</em></li>
+      <li data-reveal><span>Kelp</span><em>salinity without salt</em></li>
+      <li data-reveal><span>Bergamot</span><em>peel only, never juice</em></li>
+      <li data-reveal><span>Coriander</span><em>seed, lightly cracked</em></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ Chapter 4 — the can (the calm chapter) ════════════════════════════ -->
+<section id="product" class="product" data-depth-from="240" data-depth-to="120">
+  <div class="product__grid">
+    <figure class="product__can">
+      <img id="canImg" alt="A matte black SONAR can standing on wet basalt rock.">
+      <figcaption class="product__wordmark" aria-hidden="true">SONAR</figcaption>
+    </figure>
+
+    <div class="product__info">
+      <p class="eyebrow">03 — The can</p>
+      <h2 class="h2" data-reveal>Built to be forgotten in your hand.</h2>
+      <dl class="spec">
+        <div><dt>Volume</dt><dd>330 ml</dd></div>
+        <div><dt>Minerality</dt><dd>480 mg/L</dd></div>
+        <div><dt>Carbonation</dt><dd>4.2 g/L</dd></div>
+        <div><dt>Source depth</dt><dd>940 m</dd></div>
+        <div><dt>Sugar</dt><dd>0 g</dd></div>
+      </dl>
+      <ul class="variants">
+        <li><span class="variants__depth">940 m</span><span class="variants__name">Origin</span></li>
+        <li><span class="variants__depth">620 m</span><span class="variants__name">Kelp</span></li>
+        <li><span class="variants__depth">310 m</span><span class="variants__name">Bergamot</span></li>
+      </ul>
+    </div>
+
+    <figure class="product__pour">
+      <video class="product__pour-video" id="pourVideo" muted loop playsinline preload="none" aria-hidden="true"></video>
+      <img class="product__pour-still" id="pourStill" alt="SONAR poured over ice in a tall glass." hidden>
+      <figcaption>Serve at 6 °C. Do not garnish — the bergamot is already there.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══ Chapter 5 — the ascent ════════════════════════════════════════════ -->
+<section id="surface" class="surface" data-depth-from="120" data-depth-to="0">
+  <img class="surface__img" id="surfaceImg" alt="The underside of the sea surface, sunlight compressed into Snell's window." aria-hidden="true">
+  <div class="surface__copy">
+    <p class="eyebrow eyebrow--warm">The ascent</p>
+    <h2 class="surface__title" data-reveal>Come back up.</h2>
+    <p class="surface__body" data-reveal>Nine hundred and forty metres down, then straight into a cold can. Nothing happens to it in between.</p>
+    <a class="cta" href="#surface">Find a stockist</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <p class="foot__mark">SONAR</p>
+  <p class="foot__note">
+    A fictional brand, built as a demonstration piece. Imagery and motion generated with
+    Higgsfield; every frame verified against the physics it depicts.
+  </p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script>
+const media = {
+  // Chapter 0 — the descent, scrubbed by scroll.
+  // Kling's first 0.85 s carried a luminance surge (76.8 -> 86.7 -> 60.6, a
+  // frame delta of 13.6); that head is trimmed off. The remainder is
+  // motion-interpolated 24 -> 48 fps and re-encoded all-intra, so every one of
+  // its 197 frames is a keyframe and seeking never stalls: 1280x714, 3.0 MB.
+  descentScrub: `${VID}/471fe134-f9ba-4733-93c5-418ba4284eb0.mp4`,
+  descentPoster: `${IMG}/hf_20260901_131249_69c11246-2440-40c1-8517-1ccdda093f40_min.webp`,
+
+  // Chapter 1 — the ping. Still frame; the wavefront is drawn on canvas.
+  deepStill: `${IMG}/hf_20260901_131509_5ec00ddb-ef00-48e9-9b6a-423350839edc_min.webp`,
+
+  // Chapter 2 — the source.
+  sourceRock: `${IMG}/hf_20260901_133220_af5ed7b9-5de6-41c3-984a-b22df996975e_min.webp`,
+
+  // Chapter 3 — the botanicals. Seamless loop: the tail is crossfaded into the
+  // head rather than reversed, so the motion stays forward-only and no bubble
+  // ever travels downward. Seam delta 0.61.
+  botanicalsLoop: `${VID}/8f1fac6a-d49c-4f85-a973-dc4976b341d8.mp4`,
+  botanicalsPoster: `${IMG}/hf_20260901_131252_b544f11b-7ad6-4aac-bb12-e8eb63c033a6_min.webp`,
+  botanicalsSettled: `${IMG}/hf_20260901_131509_cf1c9910-a07d-442a-8cee-79e7b8a19480_min.webp`,
+
+  // Chapter 4 — the can, and the pour. Pour is 9:16 because Kling 3.0 emits
+  // only 16:9, 9:16 and 1:1; the keyframes were regenerated to match the clip
+  // rather than cropping the clip to fit the layout. Seam delta 0.11.
+  canHero: `${IMG}/hf_20260901_132708_ae8b7d70-ff0b-4298-bd81-3778130990e6_min.webp`,
+  pourLoop: `${VID}/5f2834a1-ffb2-41eb-856c-de40542a0e56.mp4`,
+  pourPoster: `${IMG}/hf_20260901_131653_cb3004a9-1b9d-4055-9d71-ef2ad0e89f80_min.webp`,
+  pourFilled: `${IMG}/hf_20260901_131748_3268a8d1-8c0b-4744-9d82-e71cb84ef523_min.webp`,
+
+  // Chapter 5 — the ascent. Snell's window; the only warm frame on the site
+  // (r:b 0.724 against 0.2-0.6 everywhere else), which is the point.
+  surface: `${IMG}/hf_20260901_132708_e40193a3-d85a-4afe-9a8a-df87cb3be010_min.webp`,
+};
+
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+/* ── 1. Wire the manifest into the document ─────────────────────────────
+   Nothing in the markup hard-codes a URL, so swapping the CDN for local
+   files is a one-file change.                                            */
+
+function wireMedia() {
+  $("#descentFallback").src = media.descentPoster;
+  $("#pingStill").src       = media.deepStill;
+  $("#sourceImg").src       = media.sourceRock;
+  $("#canImg").src          = media.canHero;
+  $("#surfaceImg").src      = media.surface;
+
+  const descent = $("#descent");
+  descent.poster = media.descentPoster;
+  descent.src = media.descentScrub;
+  descent.addEventListener("error", () => {
+    descent.hidden = true;
+    $("#descentFallback").hidden = false;
+  }, { once: true });
+
+  // Loops: poster-first, source attached only when the section is near.
+  setupLoop($("#botVideo"), $("#botStill"), media.botanicalsLoop, media.botanicalsPoster, media.botanicalsSettled);
+  setupLoop($("#pourVideo"), $("#pourStill"), media.pourLoop, media.pourPoster, media.pourFilled);
+
+  for (const img of $$("img")) img.loading = img.closest(".hero, .ping") ? "eager" : "lazy";
+}
+
+/* A loop plays only while it is on screen. Under reduced motion the video is
+   never loaded at all and the still stands in for it permanently. */
+function setupLoop(video, still, src, poster, reducedStill) {
+  video.poster = poster;
+  if (REDUCED) {
+    video.hidden = true;
+    still.src = reducedStill;
+    still.hidden = false;
+    return;
+  }
+  let loaded = false;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        if (!loaded) { video.src = src; loaded = true; }
+        video.play().catch(() => {});
+      } else if (loaded) {
+        video.pause();
+      }
+    }
+  }, { rootMargin: "200px 0px" });
+  io.observe(video);
+}
+
+/* ── 2. Word splitting ─────────────────────────────────────────────────── */
+
+function splitWords(el, cls) {
+  const words = el.textContent.trim().split(/\s+/);
+  el.textContent = "";
+  return words.map((w, i) => {
+    const outer = document.createElement("span");
+    if (cls === "reveal") {
+      outer.className = "word";
+      const inner = document.createElement("span");
+      inner.textContent = w;
+      outer.appendChild(inner);
+    } else {
+      outer.className = "w";
+      outer.textContent = w;
+    }
+    el.appendChild(outer);
+    if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
+    return cls === "reveal" ? outer.firstChild : outer;
+  });
+}
+
+/* ── 3. The depth instrument ────────────────────────────────────────────
+   Each chapter declares the depth band it covers. Bands are read from the
+   section's own scroll progress, so the number always agrees with what is
+   on screen — including inside pinned chapters, where ScrollTrigger already
+   accounts for the pin.                                                   */
+
+let setDepth = () => {};
+
+/* The readout sink is installed before the pinned chapters are built, because
+   they write to it from their own onUpdate. The plain chapters get their
+   triggers afterwards: ScrollTrigger resolves start/end in creation order, so a
+   trigger created before the pins would be measured against a document that
+   does not yet contain their pin distance, and would fire pages too early. */
+function initDepthOutput() {
+  const out = $("#depthVal");
+  setDepth = (v) => { out.textContent = Math.round(v); };
+}
+
+function setupDepthSections() {
+  $$("[data-depth-from]").forEach((section) => {
+    if (section.id === "hero" || section.id === "ping") return; // driven by their pins
+    const from = Number(section.dataset.depthFrom);
+    const to   = Number(section.dataset.depthTo);
+    ScrollTrigger.create({
+      trigger: section,
+      // Chapters hand over exactly at the viewport centre, so no two bands are
+      // ever live at once.
+      start: "top center",
+      end: "bottom center",
+      onUpdate: (self) => setDepth(from + (to - from) * self.progress),
+    });
+  });
+}
+
+/* ── 4. Chapter 0 — scrubbing the descent ───────────────────────────────
+   The clip is all-intra encoded, so seeking to an arbitrary frame is cheap
+   and the scrub does not stutter.                                         */
+
+const HERO = "#hero";
+const band = (sel) => Number($(sel).dataset.depthTo) - Number($(sel).dataset.depthFrom);
+
+function setupHero() {
+  const video = $("#descent");
+  const copy  = $(".hero__copy");
+  const hint  = $(".hero__hint");
+
+  // Created immediately, in DOM order. ScrollTrigger computes pin spacing in
+  // creation order, so deferring this until the video reports metadata (or
+  // never, if the file 404s) leaves every later chapter measured against a
+  // hero that was never pinned.
+  ScrollTrigger.create({
+    trigger: "#hero",
+    pin: true,
+    start: "top top",
+    end: "+=420%",
+    scrub: 0.6,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate: (self) => {
+      const d = video.duration;
+      // A stalled or malformed file reports 0, NaN or Infinity; multiplying by
+      // it yields a currentTime the browser silently discards.
+      if (Number.isFinite(d) && d > 0) video.currentTime = self.progress * d;
+      setDepth(band(HERO) * self.progress);
+    },
+  });
+
+  // The title sinks and fades with the descent; it is gone by the halfway
+  // point so the water has the frame to itself.
+  gsap.to(copy, {
+    yPercent: -18, opacity: 0, ease: "none",
+    scrollTrigger: { trigger: "#hero", start: "top top", end: "+=210%", scrub: 0.6 },
+  });
+  gsap.to(hint, {
+    opacity: 0, ease: "none",
+    scrollTrigger: { trigger: "#hero", start: "top top", end: "+=60%", scrub: true },
+  });
+
+  video.addEventListener("loadedmetadata", () => ScrollTrigger.refresh(), { once: true });
+}
+
+/* ── 5. Chapter 1 — the ping ────────────────────────────────────────────
+   The signature interaction. A wavefront leaves the can at a constant speed
+   (sound speed does not vary in a uniform medium) and its amplitude decays
+   with the square of the radius, because a fixed amount of energy is spread
+   over an expanding circle. A word switches on exactly as the front reaches
+   it — the reveal is not a timed effect, it is the geometry.              */
+
+function setupPing() {
+  const pingEl = $("#ping");
+  const PINGB = [Number(pingEl.dataset.depthFrom), Number(pingEl.dataset.depthTo)];
+  const canvas = $("#pingCanvas");
+  const ctx = canvas.getContext("2d");
+  const words = [
+    ...splitWords($("#pingLine"), "w"),
+    ...splitWords($("#pingBody"), "w"),
+  ];
+
+  // Origin sits where the can hangs in the frame: lower right.
+  const ORIGIN = { fx: 0.70, fy: 0.58 };
+  let W = 0, H = 0, ox = 0, oy = 0, rMax = 1, dists = [];
+
+  function measure() {
+    const r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ox = W * ORIGIN.fx; oy = H * ORIGIN.fy;
+    rMax = Math.max(
+      Math.hypot(ox, oy), Math.hypot(W - ox, oy),
+      Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)
+    );
+
+    const cr = canvas.getBoundingClientRect();
+    dists = words.map((w) => {
+      const b = w.getBoundingClientRect();
+      return Math.hypot((b.left + b.width / 2) - (cr.left + ox), (b.top + b.height / 2) - (cr.top + oy));
+    });
+  }
+
+  const BAND = 150;          // px of ramp behind the wavefront
+  const TRAIL = [0, 110, 220]; // trailing rings, in px behind the front
+
+  function draw(front) {
+    ctx.clearRect(0, 0, W, H);
+    for (const back of TRAIL) {
+      const r = front - back;
+      if (r <= 0) continue;
+      // Inverse-square amplitude falloff, normalised so the first metres
+      // are not blindingly bright.
+      const amp = 1 / (1 + Math.pow(r / 260, 2));
+      const alpha = amp * (back === 0 ? 0.55 : 0.22);
+      if (alpha < 0.004) continue;
+      ctx.beginPath();
+      ctx.arc(ox, oy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(79, 224, 210, ${alpha.toFixed(4)})`;
+      ctx.lineWidth = back === 0 ? 1.6 : 1;
+      ctx.stroke();
+    }
+  }
+
+  function apply(front) {
+    draw(front);
+    for (let i = 0; i < words.length; i++) {
+      const o = clamp((front - dists[i]) / BAND, 0, 1);
+      const w = words[i];
+      w.style.opacity = o;
+      w.style.transform = `translate3d(0,${((1 - o) * 10).toFixed(2)}px,0)`;
+    }
+  }
+
+  measure();
+  apply(0);
+
+  ScrollTrigger.create({
+    trigger: "#ping",
+    pin: true,
+    start: "top top",
+    end: "+=320%",
+    scrub: 0.5,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate: (self) => {
+      apply(self.progress * rMax * 1.18);
+      setDepth(PINGB[0] + (PINGB[1] - PINGB[0]) * self.progress);
+    },
+    onRefreshInit: measure,
+  });
+
+  ScrollTrigger.addEventListener("refreshInit", measure);
+}
+
+/* ── 6. Chapter reveals and parallax ────────────────────────────────────── */
+
+function setupReveals() {
+  for (const el of $$("[data-reveal]")) {
+    const trigger = { trigger: el, start: "top 85%", once: true };
+
+    // Word splitting rebuilds an element's children from its text, which would
+    // flatten any markup inside it — a list item's label and paragraph would
+    // collapse into one run of words. Only leaf elements get split; containers
+    // rise as a whole.
+    if (el.children.length > 0) {
+      gsap.fromTo(el,
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out", scrollTrigger: trigger });
+      continue;
+    }
+
+    const inners = splitWords(el, "reveal");
+    gsap.set(inners, { yPercent: 110 });
+    gsap.to(inners, {
+      yPercent: 0, duration: 0.9, ease: "power3.out", stagger: 0.045,
+      scrollTrigger: trigger,
+    });
+  }
+}
+
+/* Parallax is deliberately small. Anything larger reads as a slideshow,
+   and on a full-bleed image it exposes the crop edges. */
+function setupParallax() {
+  for (const [sel, amount] of [["#sourceImg", 8], ["#surfaceImg", 10]]) {
+    gsap.fromTo(sel,
+      { yPercent: -amount / 2, scale: 1.06 },
+      { yPercent: amount / 2, ease: "none",
+        scrollTrigger: { trigger: sel, start: "top bottom", end: "bottom top", scrub: true } });
+  }
+}
+
+/* ── 7. Boot ────────────────────────────────────────────────────────────── */
+
+function boot() {
+  wireMedia();
+
+  if (REDUCED) {
+    // Full static branch: no pin, no scrub, no wavefront. Every chapter
+    // becomes an ordinary section and all copy is visible immediately.
+    const d = $("#depthVal");
+    if (d) d.textContent = "940";
+    $("#pingCanvas")?.remove();
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const lenis = new Lenis({ lerp: 0.085 });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  initDepthOutput();
+  setupHero();
+  setupPing();
+  setupReveals();
+  setupParallax();
+  setupDepthSections();  // must come last — see the note on creation order
+
+  // Line breaks depend on the real fonts; re-measure once they land.
+  if (document.fonts?.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+  let t;
+  window.addEventListener("resize", () => {
+    clearTimeout(t);
+    t = setTimeout(() => ScrollTrigger.refresh(), 180);
+  });
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
+
+</script>
+</body>
+</html>
