@@ -1,0 +1,44 @@
+# Publishes the site to GitHub Pages.
+#
+# `configure-pages` is given `enablement: true`, so this workflow switches Pages
+# on by itself the first time it runs — the repository owner does not have to
+# visit Settings at all. It deploys an artifact rather than serving a branch,
+# so the branch layout is irrelevant to what gets published.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [claude/gigsfield-photo-links-gpdhul]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable and configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
