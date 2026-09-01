@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SONAR — deep source mineral water</title>
+<meta name="description" content="SONAR. Deep source mineral water with four botanicals. Sound finds what light cannot reach.">
+<meta name="theme-color" content="#04070a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://d8j0ntlcm91z4.cloudfront.net" crossorigin>
+<link rel="preconnect" href="https://d2ol7oe51mr4n9.cloudfront.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<a class="skip" href="#source">Skip to content</a>
+
+<header class="chrome">
+  <span class="chrome__mark">SONAR</span>
+  <span class="chrome__depth" aria-live="off">
+    <span class="chrome__depth-val" id="depthVal">0</span><span class="chrome__depth-unit">m</span>
+  </span>
+</header>
+
+<!-- ══ Chapter 0 — the descent ═══════════════════════════════════════════ -->
+<section id="hero" class="hero" data-depth-from="0" data-depth-to="80">
+  <div class="hero__media">
+    <video id="descent" class="hero__video" muted playsinline preload="auto" aria-hidden="true"></video>
+    <img id="descentFallback" class="hero__video hero__video--fallback" alt="" aria-hidden="true" hidden>
+    <div class="hero__scrim"></div>
+  </div>
+
+  <div class="hero__copy">
+    <p class="eyebrow">Deep source mineral water</p>
+    <h1 class="hero__title">SONAR</h1>
+    <p class="hero__tagline" data-reveal>Taste the depth.</p>
+  </div>
+
+  <div class="hero__hint" aria-hidden="true">
+    <span>Scroll to descend</span>
+    <span class="hero__hint-rule"></span>
+  </div>
+</section>
+
+<!-- ══ Chapter 1 — the ping ══════════════════════════════════════════════ -->
+<section id="ping" class="ping" data-depth-from="80" data-depth-to="140">
+  <div class="ping__media">
+    <img class="ping__still" id="pingStill" alt="" aria-hidden="true">
+    <canvas class="ping__canvas" id="pingCanvas" aria-hidden="true"></canvas>
+  </div>
+  <div class="ping__copy">
+    <p class="eyebrow eyebrow--accent">The principle</p>
+    <h2 class="ping__line" id="pingLine">Sound finds what light cannot reach.</h2>
+    <p class="ping__body" id="pingBody">Every source we bottle was mapped by sonar long before it was ever tasted.</p>
+  </div>
+</section>
+
+<!-- ══ Chapter 2 — the source ════════════════════════════════════════════ -->
+<section id="source" class="source" data-depth-from="140" data-depth-to="200">
+  <div class="source__media">
+    <img class="source__img" id="sourceImg" alt="A mineral spring flowing from a crevice in underwater basalt rock.">
+  </div>
+  <div class="source__steps">
+    <p class="eyebrow">01 — The source</p>
+    <h2 class="h2" data-reveal>Filtered through nine hundred metres of basalt.</h2>
+    <ol class="steps">
+      <li class="step" data-reveal>
+        <span class="step__n">Pressure</span>
+        <p>At 940 metres the water sits under ninety-four atmospheres. Nothing dissolved in it comes out again.</p>
+      </li>
+      <li class="step" data-reveal>
+        <span class="step__n">Time</span>
+        <p>It entered the rock as rain eleven thousand years ago and has been moving downward ever since.</p>
+      </li>
+      <li class="step" data-reveal>
+        <span class="step__n">Mineral</span>
+        <p>Basalt gives up silica, magnesium and a trace of lithium. We add nothing and remove nothing.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ Chapter 3 — the botanicals ════════════════════════════════════════ -->
+<section id="botanicals" class="bot" data-depth-from="200" data-depth-to="240">
+  <div class="bot__media">
+    <video class="bot__video" id="botVideo" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <img class="bot__still" id="botStill" alt="Juniper, kelp, bergamot peel and coriander seed suspended in dark water." hidden>
+  </div>
+  <div class="bot__copy">
+    <p class="eyebrow">02 — The botanicals</p>
+    <h2 class="h2" data-reveal>Four botanicals. Nothing else.</h2>
+    <ul class="bot__list">
+      <li data-reveal><span>Juniper</span><em>resin, pine, a dry finish</em></li>
+      <li data-reveal><span>Kelp</span><em>salinity without salt</em></li>
+      <li data-reveal><span>Bergamot</span><em>peel only, never juice</em></li>
+      <li data-reveal><span>Coriander</span><em>seed, lightly cracked</em></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ Chapter 4 — the can (the calm chapter) ════════════════════════════ -->
+<section id="product" class="product" data-depth-from="240" data-depth-to="120">
+  <div class="product__grid">
+    <figure class="product__can">
+      <img id="canImg" alt="A matte black SONAR can standing on wet basalt rock.">
+      <figcaption class="product__wordmark" aria-hidden="true">SONAR</figcaption>
+    </figure>
+
+    <div class="product__info">
+      <p class="eyebrow">03 — The can</p>
+      <h2 class="h2" data-reveal>Built to be forgotten in your hand.</h2>
+      <dl class="spec">
+        <div><dt>Volume</dt><dd>330 ml</dd></div>
+        <div><dt>Minerality</dt><dd>480 mg/L</dd></div>
+        <div><dt>Carbonation</dt><dd>4.2 g/L</dd></div>
+        <div><dt>Source depth</dt><dd>940 m</dd></div>
+        <div><dt>Sugar</dt><dd>0 g</dd></div>
+      </dl>
+      <ul class="variants">
+        <li><span class="variants__depth">940 m</span><span class="variants__name">Origin</span></li>
+        <li><span class="variants__depth">620 m</span><span class="variants__name">Kelp</span></li>
+        <li><span class="variants__depth">310 m</span><span class="variants__name">Bergamot</span></li>
+      </ul>
+    </div>
+
+    <figure class="product__pour">
+      <video class="product__pour-video" id="pourVideo" muted loop playsinline preload="none" aria-hidden="true"></video>
+      <img class="product__pour-still" id="pourStill" alt="SONAR poured over ice in a tall glass." hidden>
+      <figcaption>Serve at 6 °C. Do not garnish — the bergamot is already there.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══ Chapter 5 — the ascent ════════════════════════════════════════════ -->
+<section id="surface" class="surface" data-depth-from="120" data-depth-to="0">
+  <img class="surface__img" id="surfaceImg" alt="The underside of the sea surface, sunlight compressed into Snell's window." aria-hidden="true">
+  <div class="surface__copy">
+    <p class="eyebrow eyebrow--warm">The ascent</p>
+    <h2 class="surface__title" data-reveal>Come back up.</h2>
+    <p class="surface__body" data-reveal>Nine hundred and forty metres down, then straight into a cold can. Nothing happens to it in between.</p>
+    <a class="cta" href="#surface">Find a stockist</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <p class="foot__mark">SONAR</p>
+  <p class="foot__note">
+    A fictional brand, built as a demonstration piece. Imagery and motion generated with
+    Higgsfield; every frame verified against the physics it depicts.
+  </p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
