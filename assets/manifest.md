@@ -73,3 +73,70 @@ max delta **16.18 → 2.57**, seam delta **0.11**. 4049 KB → 591 KB.
 Images at 2 credits each, one 4K image at 4, three videos at 10.
 Measured against the account balance before and after: 1010 → 956,
 so **54 credits** for the whole set, including the rejected frame and the retries.
+
+
+---
+
+# Revision 2 — Kling 3.0 and Nano Banana
+
+Requested after review of the first pass: two of the three clips read as buggy,
+and the frame rate was too low.
+
+## What the measurements said
+
+The frame rate was **24 fps, not 30** — on both the old model and the new one.
+Kling 3.0 also emits 24 fps, so switching models does not touch it. Choppiness in
+a scroll-scrubbed clip comes from frames-per-pixel-of-scroll, not from the model:
+121 frames stretched over a 420 % pin is one new frame every ~30 px.
+
+Kling 3.0 was nonetheless the right call, and the numbers say why:
+
+| clip | max frame-to-frame delta, MiniMax | same, Kling 3.0 |
+|------|----------------------------------|-----------------|
+| botanicals | 1.09, and no measurable motion at all | **0.43**, with the settling now visible as centroidY 0.354 → 0.379 |
+| pour | **16.18** (an abrupt pop) | **1.53** |
+| descent | 4.64 | 13.57 in the first 0.85 s, then 0.15-2.6 |
+
+Kling's descent clip carries a luminance surge at the head (76.8 → 86.7 → 60.6).
+That 0.85 s is trimmed off; what remains is the smoothest of the three.
+
+## The frame-rate fix
+
+Motion interpolation, not a different model. The scrub clip is interpolated
+24 → 48 fps with `minterpolate` (mci/aobmc/bidir) and re-encoded all-intra:
+
+- **95 → 197 frames** of temporal resolution
+- **all 197 are keyframes**, so seeking never stalls
+- max frame-to-frame delta **13.57 → 2.11**
+- and it got *smaller*: 4.3 MB → **3.0 MB**, at 1280x714
+
+The two ambient loops were left at 24 fps deliberately. They play at natural
+speed, where 24 fps is a normal cinematic rate; interpolating them would have
+doubled their weight for no perceptible gain.
+
+## Stills
+
+Regenerated with Nano Banana. Requested as `nano_banana_pro`; the service
+reports every job as `nano_banana_2` — worth knowing before choosing between
+them. Prompts were rewritten short and concrete rather than filling a
+seven-slot template.
+
+The technique that mattered: each pair's END frame was generated with its START
+frame passed as an `image_references` input. In revision 1 an unreferenced end
+frame came back amber (r:b 3.115) against a set running 0.20-0.70 and had to be
+thrown away. This time every pair matched first time:
+
+| pair | luma | r:b | reads as |
+|------|------|-----|----------|
+| descent | 75.3 → 26.3 | 0.418 → 0.233 | light attenuating, red dying before blue |
+| botanicals | 52.5 → 50.9 | 0.335 → 0.293 | constant light, mass settling downward |
+| pour | 31.3 → 42.4 | top row stays 9 | glass filling, headline space preserved |
+
+Coldest frame of the set is the source rock at r:b 0.165; the warmest is Snell's
+window at 0.724, which is the one warm frame the design allows.
+
+## Layout consequence
+
+Kling 3.0 emits only 16:9, 9:16 and 1:1. The pour was 3:4, so its keyframes were
+regenerated at 9:16 and the CSS follows the clip — rather than cropping the clip
+to fit a box chosen before the constraint was known.

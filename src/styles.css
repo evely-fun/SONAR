@@ -298,7 +298,10 @@ a { color: inherit; }
 
 .product__pour { margin: 0; }
 .product__pour-video, .product__pour-still {
-  width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
+  /* 9:16, not 3:4 — Kling 3.0 only emits 16:9, 9:16 and 1:1, so the keyframes
+     were regenerated to match the clip rather than cropping the clip to match
+     an arbitrary box. */
+  width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
 }
 .product__pour figcaption {
   margin-top: var(--s2); color: var(--ink-faint);
